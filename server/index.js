@@ -63,7 +63,7 @@ app.get("/me", isAuthenticated, async (req, res, next) => {
 // webhook
 app.post("/apple-webhook", (req, res) => {
   console.log("Webhook Received", req.body);
-  res.status(201).json({ success: true });
+  res.status(200).json({ success: true });
 })
 
 app.get("/get-courses", async (req, res, next) => {
