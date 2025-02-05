@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import prisma from "./utils/prisma.js";
 import jwt from "jsonwebtoken";
 import { sendToken } from "./utils/sendToken.js";
-import {isAuthenticated} from "./middleware/auth.js";
+import { isAuthenticated } from "./middleware/auth.js";
 
 dotenv.config();
 
@@ -58,6 +58,61 @@ app.get("/me", isAuthenticated, async (req, res, next) => {
   } catch (error) {
     console.log(error);
   }
+});
+
+// webhook
+app.post("/apple-webhook", (req, res) => {
+  console.log("Webhook Received", req.body);
+  res.status(201).json({ success: true });
+})
+
+app.get("/get-courses", async (req, res, next) => {
+  try {
+    const courses = await prisma.course.findMany({
+      include: {
+        courseData: {
+          include: {
+            links: true,
+          },
+        },
+        benefits: true,
+        prerequisites: true,
+      },
+    });
+
+    res.status(201).json({
+      success: true,
+      courses,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+app.get("/get-reviews/:courseId", async (req, res) => {
+  const reviewsData = await prisma.reviews.findMany({
+    where: {
+      courseId: req.params.courseId,
+    },
+    include: {
+      user: true,
+      replies: {
+        include: {
+          user: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+  res.status(201).json({
+    success: true,
+    reviewsData,
+  });
 });
 
 app.listen(port, () => {
