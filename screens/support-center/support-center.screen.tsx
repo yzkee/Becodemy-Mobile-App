@@ -23,6 +23,8 @@ import IconOne from "@/assets/svgs/onboarding/icon-1";
 import IconTwo from "@/assets/svgs/onboarding/icon-2";
 import IconThree from "@/assets/svgs/onboarding/icon-3";
 import { BlurView } from "expo-blur";
+import useUser, { setAuthorizationHeader } from "@/hooks/fetch/useUser";
+import axios from "axios";
 
 export default function SupportCenterScreen() {
   const { theme } = useTheme();
@@ -30,6 +32,41 @@ export default function SupportCenterScreen() {
   const [ticketTitle, setTicketTitle] = useState("");
   const [ticketDescription, setTicketDescription] = useState("");
   const [loader, setLoader] = useState(false);
+  const { user, refetch } = useUser();
+
+  const supportChatHanlder = () => {
+    const isHasOpenTikcet = user?.Tickets.find(
+      (i: TicketsTypes) => i.status !== "Closed"
+    );
+    if (isHasOpenTikcet) {
+      router.push({
+        pathname: "/(routes)/support-chat",
+        params: { ticket: JSON.stringify(isHasOpenTikcet) },
+      });
+    }
+  };
+
+  const ticketCreateHandler = async () => {
+    if (ticketTitle !== "" || ticketDescription !== "") {
+      setLoader(true);
+      await setAuthorizationHeader();
+      await axios
+        .post(`${process.env.EXPO_PUBLIC_SERVER_URI}/create-ticket`, {
+          ticketTitle,
+          details: ticketDescription,
+        })
+        .then((res) => {
+          setTicketTitle("");
+          setTicketDescription("");
+          setOpen(false);
+          refetch();
+          router.push({
+            pathname: "/(routes)/support-chat",
+            params: { ticket: JSON.stringify(res.data.ticket) },
+          });
+        });
+    }
+  };
 
   return (
     <ScrollView
@@ -107,7 +144,7 @@ export default function SupportCenterScreen() {
             flexDirection: "row",
             gap: scale(10),
           }}
-          onPress={() => setOpen(true)}
+          onPress={() => supportChatHanlder()}
         >
           <IconOne />
           <View>
@@ -150,7 +187,7 @@ export default function SupportCenterScreen() {
             flexDirection: "row",
             gap: scale(10),
           }}
-            onPress={() => router.push("/(routes)/faq")}
+          onPress={() => router.push("/(routes)/faq")}
         >
           <IconTwo />
           <View>
@@ -326,6 +363,7 @@ export default function SupportCenterScreen() {
                     borderRadius: scale(8),
                     marginTop: verticalScale(15),
                   }}
+                  onPress={() => ticketCreateHandler()}
                 >
                   {loader ? (
                     <ActivityIndicator size={"small"} />

@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTheme } from "@/context/theme.context";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { scale, verticalScale } from "react-native-size-matters";
@@ -21,17 +21,49 @@ import { Skeleton } from "moti/skeleton";
 import { NotificationsData } from "@/configs/constants";
 import { Swipeable } from "react-native-gesture-handler";
 import useUserData from "@/hooks/useUserData";
+import { setAuthorizationHeader } from "@/hooks/fetch/useUser";
+import axios from "axios";
+import moment from "moment";
 
 export default function NotificationScreen() {
   const { theme } = useTheme();
   const { avatar } = useUserData();
-  const [loader, setLoader] = useState(false);
+  const [loader, setLoader] = useState(true);
   const [active, setActive] = useState("All");
+  const [notificationsData, setNotificationsData] = useState<
+    NotificationType[]
+  >([]);
 
-  const renderItem = ({ item }:{item:any}) => (
+  useEffect(() => {
+    const subscription = async () => {
+      await setAuthorizationHeader();
+      const response = await axios.get(
+        `${process.env.EXPO_PUBLIC_SERVER_URI}/get-notifications`
+      );
+      setNotificationsData(response.data.notifications);
+      setLoader(false);
+    };
+    subscription();
+  }, []);
+
+  const notificationDeleteHandler = async (item: NotificationType) => {
+    await setAuthorizationHeader();
+    await axios
+      .delete(
+        `${process.env.EXPO_PUBLIC_SERVER_URI}/delete-notification/${item.id}`
+      )
+      .then((res) => {
+        setNotificationsData(res.data.notifications);
+      });
+  };
+
+  const renderItem = ({ item }: { item: NotificationType }) => (
     <Swipeable
       renderRightActions={() => (
-        <Pressable style={styles.deleteButton}>
+        <Pressable
+          style={styles.deleteButton}
+          onPress={() => notificationDeleteHandler(item)}
+        >
           <MaterialIcons
             name="delete-outline"
             size={scale(25)}
@@ -49,7 +81,7 @@ export default function NotificationScreen() {
             backgroundColor:
               item.status === "Unread"
                 ? theme.dark
-                  ? "#3c4385c"
+                  ? "#3c43485c"
                   : "#f1f1f1"
                 : theme.dark
                 ? "#101010"
@@ -59,7 +91,7 @@ export default function NotificationScreen() {
       >
         {avatar && (
           <Image
-            source={{ uri: avatar }}
+            source={{ uri: item.user?.avatar }}
             width={scale(50)}
             height={scale(50)}
             borderRadius={scale(100)}
@@ -99,7 +131,7 @@ export default function NotificationScreen() {
               },
             ]}
           >
-            2 days ago
+            {moment(item.createdAt).fromNow()}
           </Text>
         </View>
       </Pressable>
@@ -312,7 +344,7 @@ export default function NotificationScreen() {
             </View>
 
             <FlatList
-              data={NotificationsData}
+              data={notificationsData}
               renderItem={renderItem}
               keyExtractor={(item) => item.id}
             />

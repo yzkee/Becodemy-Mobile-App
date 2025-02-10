@@ -6,7 +6,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useTheme } from "@/context/theme.context";
 import useUserData from "@/hooks/useUserData";
 import { LinearGradient } from "expo-linear-gradient";
@@ -20,11 +20,28 @@ import {
 } from "@/themes/app.constant";
 import { moderateScale, scale, verticalScale } from "react-native-size-matters";
 import { EvilIcons, Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { setAuthorizationHeader } from "@/hooks/fetch/useUser";
+import axios from "axios";
 
 export default function WelcomeHeader() {
   const { theme } = useTheme();
   const { name } = useUserData();
   const [notificationLength, setnotificationLength] = useState(0);
+
+  useEffect(() => {
+    const subscription = async () => {
+      await setAuthorizationHeader();
+      const response = await axios.get(
+        `${process.env.EXPO_PUBLIC_SERVER_URI}/get-notifications`
+      );
+      const filteredNotifications = response.data.notifications?.filter(
+        (i: any) => i.status === "Unread"
+      );
+      setnotificationLength(filteredNotifications.length);
+    };
+    subscription();
+  }, []);
 
   return (
     <LinearGradient
@@ -70,7 +87,7 @@ export default function WelcomeHeader() {
           </Text>
         </View>
         <View style={{ flexDirection: "row" }}>
-          <Pressable>
+          <Pressable onPress={() => router.push("/(routes)/notification")}>
             <View
               style={[
                 styles.notificationWrapper,

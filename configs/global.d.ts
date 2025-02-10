@@ -27,7 +27,6 @@ type UserType = {
   updatedAt: Date;
 };
 
-
 type ReviewsType = {
   id: string;
   user: UserType;
@@ -60,6 +59,14 @@ type AnswerType = {
   updatedAt: Date;
 };
 
+type BenefitsType = {
+  id: string;
+  title: string;
+  courseId: string;
+  createdAt: any;
+  updatedAt: any;
+};
+
 type QuestionType = {
   id: string;
   userId: string;
@@ -68,6 +75,66 @@ type QuestionType = {
   question: string;
   image?: string;
   answers: AnswerType[];
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+type QuestionType = {
+  id: string;
+  userId: string;
+  user: UserType;
+  contentId: string;
+  question: string;
+  image?: string;
+  answers: AnswerType[];
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+type CourseDataType = {
+  id: string;
+  title: string;
+  videoUrl: string;
+  conversationId?: string;
+  videoSection: string;
+  questions: QuestionType[];
+  description: string;
+  videoLength: string;
+  links: any;
+  videoPlayer: string | null;
+  courseId: string;
+};
+
+type NotificationType = {
+  id: string;
+  title: string;
+  message: string;
+  status: string;
+  user?: UserType;
+  creatorId: string;
+  receiverId: string | null;
+  redirect_link: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+type TicketReplies = {
+  id: string;
+  ticketId: string;
+  reply: string;
+  user: UserType;
+  replyId: string;
+  createdAt: Date | null;
+  updatedAt: Date | null;
+};
+
+type TicketsTypes = {
+  id: string;
+  creatorId: string;
+  ticketTitle: string;
+  reply: TicketReplies[];
+  details: string;
+  status: string;
   createdAt: Date;
   updatedAt: Date;
 };

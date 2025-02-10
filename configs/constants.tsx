@@ -77,8 +77,8 @@ export const RIGHT_SNAP_POINTS = [NEXT, WIDTH - MARGIN_WIDTH];
 export const bannerData = [
   {
     image:
-      "https://res.cloudinary.com/dkg6jv4l0/image/upload/v1729365053/WhatsApp_Image_2024-09-02_at_2.07.32_PM_kb1mwe.jpg",
-    url: "https://react-native.becodemy.com",
+      "https://res.cloudinary.com/dkg6jv4l0/image/upload/v1731710065/Let_s-build-a-production-ready-LMS-Mobile-App-with-Expo-React-Native_ahqpvx.png",
+    url: "https://youtu.be/0sfVmH5_nj4",
   },
   {
     image:

@@ -135,6 +135,12 @@ export default function ProfileScreen() {
             justifyContent: "space-between",
             marginBottom: verticalScale(20),
           }}
+          onPress={() =>
+            router.push({
+              pathname: "/(routes)/enrolled-courses",
+              params: { courses: JSON.stringify(user?.orders) },
+            })
+          }
         >
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <View

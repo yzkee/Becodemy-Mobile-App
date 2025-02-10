@@ -2,7 +2,7 @@
   "expo": {
     "name": "Becodemy",
     "slug": "Becodemy-App",
-    "version": "1.0.0",
+    "version": "3.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "becodemy",
@@ -14,14 +14,15 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.becodemy.tutorial"
+      "bundleIdentifier": "com.becodemy.youtubetutorial"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.becodemy.tutorial"
+      "package": "com.becodemy.youtubetutorial",
+      "googleServiceFiles": "./android/app/google-services.json"
     },
     "web": {
       "bundler": "metro",
@@ -31,6 +32,7 @@
     "plugins": [
       "expo-router",
       "expo-secure-store",
+      "react-native-iap",
       [
         "@react-native-google-signin/google-signin",
         {

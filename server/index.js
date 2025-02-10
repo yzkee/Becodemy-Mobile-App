@@ -5,16 +5,12 @@ import jwt from "jsonwebtoken";
 import { sendToken } from "./utils/sendToken.js";
 import { isAuthenticated } from "./middleware/auth.js";
 import axios from "axios";
-import path from "path";
-import { fileURLToPath } from "url";
-import { GoogleAuth } from "google-auth-library";
+
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 6000;
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 const APPLE_SANDBOX_URL = "https://sandbox.itunes.apple.com/verifyReceipt";
 const APPLE_PROD_URL = "https://buy.itunes.apple.com/verifyReceipt";
 const APP_SHARED_SECRET = "4a30a73d10874dbfb41e37cf8cc20b48";
@@ -593,25 +589,6 @@ app.put("/ticket-reply", isAuthenticated, async (req, res) => {
   }
 });
 
-const SERVICE_ACCOUNT_PATH = path.join(
-  __dirname,
-  "becodemy-app-644c09dbb961.json"
-);
-
-async function getGoogleAccessToken() {
-  try {
-    const auth = GoogleAuth({
-      keyFile: SERVICE_ACCOUNT_PATH,
-      scopes: ["https://www.googleapis.com/auth/androidpublisher"],
-    });
-
-    const client = await auth.getClient();
-    const accessToken = await client.getAcessToken();
-    return accessToken.token;
-  } catch (error) {
-    console.log(error, "Error generating google access token");
-  }
-}
 
 // android create order
 app.post("/android-create-order", isAuthenticated, async (req, res, next) => {
@@ -629,25 +606,7 @@ app.post("/android-create-order", isAuthenticated, async (req, res, next) => {
     if (existingPurchase) {
       return res.status(400).json({ error: "🚨 Duplicate purchase detected!" });
     }
-
-    const googleAccesstoken = await getGoogleAccessToken();
-
-    if (!googleAccesstoken) {
-      return res
-        .status(500)
-        .json({ error: "failed to authenticated with google play" });
-    }
-
-    // verify with google play API
-    const response = await axios.get(
-      `https://www.googleapis.com/androidpublisher/v3/applications/com.becodemy.youtubetutorial/purchases/products/${productId}/tokens/${purchaseToken}`,
-      {
-        headers: {
-          Authorization: `Bearer${googleAccesstoken}`,
-        },
-      }
-    );
-
+    
     const purchseData = response.data;
 
     if (purchseData.purchaseState !== 0) {

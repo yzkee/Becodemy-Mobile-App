@@ -73,7 +73,7 @@ export default function AuthModal({
     }
   };
 
-  const fetchAccessToken = async (code:string) => {
+  const fetchAccessToken = async (code: string) => {
     const tokenResponse = await fetch(
       "https://github.com/login/oauth/access_token",
       {
@@ -151,6 +151,10 @@ export default function AuthModal({
       }
     );
     await SecureStore.setItemAsync("accessToken", res.data.accessToken);
+    await SecureStore.setItemAsync("name", name);
+    await SecureStore.setItemAsync("email", email);
+    await SecureStore.setItemAsync("avatar", email);
+
     setModalVisible(false);
     router.push("/(tabs)");
   };
